@@ -14,15 +14,15 @@ func TestServiceProvider_Metadata(t *testing.T) {
 		WithDriver("sqlite").
 		WithDatabase(":memory:")
 
-	provider := NewServiceProvider(config)
+	provider := &DatabaseServiceProvider{Config: config}
 
 	// Test Name
-	assert.Equal(t, "database", provider.Name(), "Provider name should be 'database'")
+	assert.Equal(t, "dg-database", provider.Name(), "Provider name should be 'dg-database'")
 
 	// Test Version
 	version := provider.Version()
 	assert.NotEmpty(t, version, "Provider version should not be empty")
-	assert.Equal(t, "1.0.0", version, "Provider version should be 1.0.0")
+	assert.Equal(t, "1.4.0", version, "Provider version should be 1.4.0")
 
 	// Test Dependencies
 	deps := provider.Dependencies()
@@ -40,15 +40,15 @@ func TestServiceProvider_Register(t *testing.T) {
 		WithDriver("sqlite").
 		WithDatabase(":memory:")
 
-	provider := NewServiceProvider(config)
+	provider := &DatabaseServiceProvider{Config: config}
 
 	// Register provider
 	err := provider.Register(app)
 	require.NoError(t, err, "Provider registration should not fail")
 
-	// Test that "db" binding exists
+	// Test that "database" binding exists
 	t.Run("db binding registered", func(t *testing.T) {
-		db, err := app.Make("db")
+		db, err := app.Make("database")
 		require.NoError(t, err, "Should be able to resolve 'db' binding")
 		assert.NotNil(t, db, "Database manager should not be nil")
 
@@ -64,8 +64,8 @@ func TestServiceProvider_Register(t *testing.T) {
 
 	// Test singleton behavior
 	t.Run("singleton behavior", func(t *testing.T) {
-		db1, _ := app.Make("db")
-		db2, _ := app.Make("db")
+		db1, _ := app.Make("database")
+		db2, _ := app.Make("database")
 
 		// Should return the same instance
 		assert.Same(t, db1, db2, "Should return the same database manager instance")
@@ -83,13 +83,13 @@ func TestServiceProvider_Register_WithLogger(t *testing.T) {
 		WithDriver("sqlite").
 		WithDatabase(":memory:")
 
-	provider := NewServiceProvider(config)
+	provider := &DatabaseServiceProvider{Config: config}
 
 	err := provider.Register(app)
 	require.NoError(t, err, "Provider registration should not fail with logger")
 
 	// Verify db can be resolved
-	db, err := app.Make("db")
+	db, err := app.Make("database")
 	require.NoError(t, err)
 	assert.NotNil(t, db)
 }
@@ -102,7 +102,7 @@ func TestServiceProvider_Boot(t *testing.T) {
 		WithDriver("sqlite").
 		WithDatabase(":memory:")
 
-	provider := NewServiceProvider(config)
+	provider := &DatabaseServiceProvider{Config: config}
 
 	// Register first
 	err := provider.Register(app)
@@ -113,7 +113,7 @@ func TestServiceProvider_Boot(t *testing.T) {
 	assert.NoError(t, err, "Boot should succeed with valid SQLite config")
 
 	// Verify connection is working
-	dbInstance, _ := app.Make("db")
+	dbInstance, _ := app.Make("database")
 	manager := dbInstance.(*Manager)
 
 	err = manager.Ping()
@@ -131,7 +131,7 @@ func TestServiceProvider_Boot_ConnectionFailure(t *testing.T) {
 		WithPort(3306).
 		WithDatabase("test")
 
-	provider := NewServiceProvider(config)
+	provider := &DatabaseServiceProvider{Config: config}
 
 	// Register
 	err := provider.Register(app)
@@ -156,7 +156,7 @@ func TestServiceProvider_Boot_WithLogger(t *testing.T) {
 		WithDriver("sqlite").
 		WithDatabase(":memory:")
 
-	provider := NewServiceProvider(config)
+	provider := &DatabaseServiceProvider{Config: config}
 
 	err := provider.Register(app)
 	require.NoError(t, err)
@@ -190,7 +190,7 @@ func TestServiceProvider_Boot_WithReadWriteSplitting(t *testing.T) {
 		},
 	}
 
-	provider := NewServiceProvider(config)
+	provider := &DatabaseServiceProvider{Config: config}
 
 	err := provider.Register(app)
 	require.NoError(t, err)
@@ -218,7 +218,7 @@ func TestServiceProvider_Boot_WithMultipleConnections(t *testing.T) {
 		},
 	}
 
-	provider := NewServiceProvider(config)
+	provider := &DatabaseServiceProvider{Config: config}
 
 	err := provider.Register(app)
 	require.NoError(t, err)
@@ -227,7 +227,7 @@ func TestServiceProvider_Boot_WithMultipleConnections(t *testing.T) {
 	assert.NoError(t, err, "Boot should succeed with multiple connections")
 
 	// Verify named connections are accessible
-	dbInstance, _ := app.Make("db")
+	dbInstance, _ := app.Make("database")
 	manager := dbInstance.(*Manager)
 
 	assert.True(t, manager.HasConnection("analytics"), "Should have analytics connection")
@@ -244,7 +244,7 @@ func TestServiceProvider_IntegrationWithDgCore(t *testing.T) {
 		WithDriver("sqlite").
 		WithDatabase(":memory:")
 
-	provider := NewServiceProvider(config)
+	provider := &DatabaseServiceProvider{Config: config}
 
 	// Register
 	err := provider.Register(app)
@@ -255,7 +255,7 @@ func TestServiceProvider_IntegrationWithDgCore(t *testing.T) {
 	require.NoError(t, err, "Boot should succeed")
 
 	// Use the database
-	dbInstance, err := app.Make("db")
+	dbInstance, err := app.Make("database")
 	require.NoError(t, err)
 
 	manager := dbInstance.(*Manager)
@@ -293,13 +293,13 @@ func TestServiceProvider_Boot_PingFailure(t *testing.T) {
 		WithDriver("sqlite").
 		WithDatabase(":memory:")
 
-	provider := NewServiceProvider(config)
+	provider := &DatabaseServiceProvider{Config: config}
 
 	err := provider.Register(app)
 	require.NoError(t, err)
 
 	// Get the manager and close it before boot
-	dbInstance, _ := app.Make("db")
+	dbInstance, _ := app.Make("database")
 	manager := dbInstance.(*Manager)
 	manager.Close()
 
@@ -317,7 +317,7 @@ func TestServiceProvider_Boot_NoLogger(t *testing.T) {
 		WithDriver("sqlite").
 		WithDatabase(":memory:")
 
-	provider := NewServiceProvider(config)
+	provider := &DatabaseServiceProvider{Config: config}
 
 	err := provider.Register(app)
 	require.NoError(t, err)
@@ -352,11 +352,11 @@ func TestServiceProvider_Boot_WithLogger_ReadWriteSplitting(t *testing.T) {
 		},
 	}
 
-	provider := NewServiceProvider(config)
+	provider := &DatabaseServiceProvider{Config: config}
 
 	// Register - this will create manager with logger from config
 	// We need to modify the singleton to inject logger
-	app.Singleton("db", func() interface{} {
+	app.Singleton("database", func() interface{} {
 		manager, err := NewManager(config, logger)
 		if err != nil {
 			panic(err)
@@ -390,10 +390,10 @@ func TestServiceProvider_Boot_WithLogger_NamedConnections(t *testing.T) {
 		},
 	}
 
-	provider := NewServiceProvider(config)
+	provider := &DatabaseServiceProvider{Config: config}
 
 	// Register - manually inject logger
-	app.Singleton("db", func() interface{} {
+	app.Singleton("database", func() interface{} {
 		manager, err := NewManager(config, logger)
 		if err != nil {
 			panic(err)
