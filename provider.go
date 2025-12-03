@@ -73,9 +73,19 @@ func (p *DatabaseServiceProvider) Boot(app foundation.Application) error {
 	}
 	manager := managerInstance.(*Manager)
 
-	// Test connection
+	// Test connection (non-fatal - log warning if fails)
 	if err := manager.Ping(); err != nil {
-		return fmt.Errorf("database connection failed: %w", err)
+		// Log warning but don't fail boot
+		// This allows the app to start even if database is temporarily unavailable
+		if manager.logger != nil {
+			manager.logWarn("Database connection test failed - database may be unavailable",
+				"error", err,
+				"driver", p.Config.Driver,
+				"host", p.Config.Host,
+				"database", p.Config.Database)
+		}
+		// Return nil to allow boot to continue
+		return nil
 	}
 
 	// Log success if logger available
