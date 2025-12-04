@@ -42,19 +42,9 @@ func (p *DatabaseServiceProvider) Register(app foundation.Application) error {
 
 	// Register database manager
 	app.Singleton("database", func() (interface{}, error) {
-		// Try to resolve logger (optional)
-		var logger Logger
-		if loggerInstance, err := app.Make("logger"); err == nil {
-			// Adapt dg-core logger to database.Logger interface
-			if l, ok := loggerInstance.(interface {
-				Info(msg string, keysAndValues ...interface{})
-				Warn(msg string, keysAndValues ...interface{})
-			}); ok {
-				logger = &loggerAdapter{logger: l}
-			}
-		}
-
-		manager, err := NewManager(cfg, logger)
+		// Create manager without logger
+		// Logger will be injected separately if needed
+		manager, err := NewManager(cfg, nil)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create database manager: %w", err)
 		}
@@ -66,46 +56,8 @@ func (p *DatabaseServiceProvider) Register(app foundation.Application) error {
 
 // Boot boots the database services
 func (p *DatabaseServiceProvider) Boot(app foundation.Application) error {
-	// Get manager
-	managerInstance, err := app.Make("database")
-	if err != nil {
-		return fmt.Errorf("failed to get database manager: %w", err)
-	}
-	manager := managerInstance.(*Manager)
-
-	// Test connection (non-fatal - log warning if fails)
-	if err := manager.Ping(); err != nil {
-		// Log warning but don't fail boot
-		// This allows the app to start even if database is temporarily unavailable
-		if manager.logger != nil {
-			manager.logWarn("Database connection test failed - database may be unavailable",
-				"error", err,
-				"driver", p.Config.Driver,
-				"host", p.Config.Host,
-				"database", p.Config.Database)
-		}
-		// Return nil to allow boot to continue
-		return nil
-	}
-
-	// Log success if logger available
-	if manager.logger != nil {
-		manager.logInfo("Database connected successfully",
-			"driver", p.Config.Driver,
-			"database", p.Config.Database)
-
-		if p.Config.ReadWriteSplitting {
-			manager.logInfo("Read/write splitting enabled",
-				"slaves", len(p.Config.Slaves),
-				"strategy", p.Config.SlaveStrategy)
-		}
-
-		if len(p.Config.Connections) > 0 {
-			manager.logInfo("Named connections established",
-				"count", len(p.Config.Connections))
-		}
-	}
-
+	// Database will be resolved when needed
+	// No need to verify resolution here to avoid deadlock
 	return nil
 }
 
