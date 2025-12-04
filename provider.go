@@ -19,7 +19,7 @@ type DatabaseServiceProvider struct {
 
 // Name returns the provider name
 func (p *DatabaseServiceProvider) Name() string {
-	return "dg-database"
+	return "database"
 }
 
 // Version returns the provider version

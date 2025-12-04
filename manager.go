@@ -234,6 +234,12 @@ func (m *Manager) Close() error {
 	return nil
 }
 
+// Stop stops the database manager gracefully.
+// This implements the Stoppable interface.
+func (m *Manager) Stop(ctx context.Context) error {
+	return m.Close()
+}
+
 // ========== Read/Write Splitting Methods ==========
 
 // Master returns the master connection (forces master for reads).
