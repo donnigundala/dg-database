@@ -5,6 +5,45 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2025-12-05
+
+### Added
+- **DB Interface**: Added `DB` interface for better abstraction and testability
+- **Auto-registration**: Named connections now auto-registered in container
+- **Helper Functions**: Added `Resolve()`, `MustResolve()`, `ResolveConnection()`, `MustResolveConnection()`
+- **Injectable Helper**: Added `Injectable` struct for easier dependency injection
+- New file: `contracts.go` - Database interface definitions
+- New file: `helpers.go` - Resolution and injection helpers
+
+### Enhanced
+- **Provider**: Now auto-registers named connections as `database.<name>` in container
+- **Container Integration**: Named connections accessible via `app.Make("database.analytics")`
+- **Developer Experience**: Simplified multi-connection usage
+
+### Breaking Changes
+- None! All changes are backward compatible
+
+### Usage Examples
+
+```go
+// Before: Manual resolution
+dbInstance, _ := app.Make("database")
+manager := dbInstance.(*database.Manager)
+analyticsDB := manager.Connection("analytics")
+
+// After: Direct resolution
+analyticsDB, _ := app.Make("database.analytics")
+
+// Or use helpers
+db, _ := database.Resolve(app)
+analyticsDB, _ := database.ResolveConnection(app, "analytics")
+
+// Or use Injectable
+inject := database.NewInjectable(app)
+db := inject.DB()
+analyticsDB := inject.Connection("analytics")
+```
+
 ## [1.1.0] - 2025-11-24
 
 ### Added

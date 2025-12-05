@@ -24,7 +24,7 @@ func (p *DatabaseServiceProvider) Name() string {
 
 // Version returns the provider version
 func (p *DatabaseServiceProvider) Version() string {
-	return "1.4.0"
+	return "1.5.0"
 }
 
 // Dependencies returns the provider dependencies
@@ -48,6 +48,24 @@ func (p *DatabaseServiceProvider) Register(app foundation.Application) error {
 		if err != nil {
 			return nil, fmt.Errorf("failed to create database manager: %w", err)
 		}
+
+		// Auto-register named connections in container
+		// This allows direct resolution via app.Make("database.analytics")
+		for name := range cfg.Connections {
+			connectionName := "database." + name
+			capturedName := name // Capture for closure
+
+			app.Singleton(connectionName, func() (interface{}, error) {
+				// Resolve manager to get connection
+				managerInstance, err := app.Make("database")
+				if err != nil {
+					return nil, fmt.Errorf("failed to resolve database manager: %w", err)
+				}
+				mgr := managerInstance.(*Manager)
+				return mgr.Connection(capturedName), nil
+			})
+		}
+
 		return manager, nil
 	})
 
