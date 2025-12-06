@@ -22,6 +22,13 @@ A powerful, production-ready database plugin for the DG Framework with support f
 - **Runtime Management**: Add/remove connections at runtime
 - **Fluent Configuration**: Easy-to-use configuration API
 
+### 🎯 Container Integration (v1.5.0)
+- **DB Interface**: Type-safe abstraction for better testability
+- **Auto-Registration**: Named connections automatically registered in container
+- **Helper Functions**: Convenient resolution with `Resolve()`, `ResolveConnection()`
+- **Injectable Pattern**: Clean dependency injection support
+- **Direct Access**: Resolve connections via `app.Make("database.analytics")`
+
 ### 🔍 Observability Features
 - **Connection Pool Metrics**: Monitor pool statistics (open, in-use, idle connections)
 - **Enhanced Health Checks**: Detailed health status with latency tracking
@@ -142,6 +149,66 @@ manager.Connection("logs").Find(&logs)         // Logs
 manager.AddConnection("cache", cacheConfig)
 manager.RemoveConnection("cache")
 ```
+
+### Container Integration (v1.5.0)
+
+Named connections are automatically registered in the container for easy access:
+
+```go
+// Configure with named connections
+config := database.Config{
+    Driver:   "postgres",
+    Database: "primary",
+    
+    Connections: map[string]database.ConnectionConfig{
+        "analytics": {
+            Driver:   "postgres",
+            Host:     "analytics.db.com",
+            Database: "analytics",
+        },
+        "logs": {
+            Driver:   "postgres",
+            Host:     "logs.db.com",
+            Database: "logs",
+        },
+    },
+}
+
+// Register provider
+provider := &database.DatabaseServiceProvider{}
+app.Register(provider)
+app.Boot()
+
+// Option 1: Direct resolution from container
+analyticsDB, _ := app.Make("database.analytics")
+logsDB, _ := app.Make("database.logs")
+
+// Option 2: Use helper functions
+db, _ := database.Resolve(app)
+analyticsDB, _ := database.ResolveConnection(app, "analytics")
+
+// Option 3: Injectable pattern (best for services)
+type UserService struct {
+    inject *database.Injectable
+}
+
+func NewUserService(app foundation.Application) *UserService {
+    return &UserService{
+        inject: database.NewInjectable(app),
+    }
+}
+
+func (s *UserService) TrackUser(user *User) {
+    // Main database
+    s.inject.DB().DB().Create(user)
+    
+    // Analytics database
+    s.inject.Connection("analytics").Create(&AnalyticsEvent{
+        UserID: user.ID,
+    })
+}
+```
+
 
 ## Configuration
 
@@ -540,6 +607,26 @@ manager.Connection("analytics").Create(&event)
 ```
 
 ## API Reference
+
+### Helper Functions (v1.5.0)
+
+#### Resolution Helpers
+- `Resolve(app foundation.Application) (DB, error)` - Resolve main database manager
+- `MustResolve(app foundation.Application) DB` - Resolve or panic
+- `ResolveConnection(app foundation.Application, name string) (*gorm.DB, error)` - Resolve named connection
+- `MustResolveConnection(app foundation.Application, name string) *gorm.DB` - Resolve named connection or panic
+
+#### Injectable Pattern
+```go
+type Injectable struct {
+    app foundation.Application
+}
+
+func NewInjectable(app foundation.Application) *Injectable
+func (i *Injectable) DB() DB
+func (i *Injectable) Connection(name string) *gorm.DB
+func (i *Injectable) TryConnection(name string) *gorm.DB
+```
 
 ### Manager Methods
 
