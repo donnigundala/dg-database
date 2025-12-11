@@ -30,7 +30,7 @@ type AuditLog struct {
 }
 
 func main() {
-	fmt.Println("=== Container Integration Example ===\n")
+	fmt.Println("=== Container Integration Example ===")
 
 	// 1. Setup application
 	app := foundation.New(".")
@@ -73,7 +73,7 @@ func main() {
 	auditDB, _ := database.ResolveConnection(app, "audit")
 	auditDB.AutoMigrate(&AuditLog{})
 
-	fmt.Println("✅ Databases initialized and migrated\n")
+	fmt.Println("✅ Databases initialized and migrated")
 
 	// ========================================
 	// Pattern 1: Direct Resolution from Container
