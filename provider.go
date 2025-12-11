@@ -49,12 +49,16 @@ func (p *DatabaseServiceProvider) Register(app foundation.Application) error {
 			return nil, fmt.Errorf("failed to create database manager: %w", err)
 		}
 
-		// Auto-register named connections in container
-		// This allows direct resolution via app.Make("database.analytics")
-		for name := range cfg.Connections {
-			connectionName := "database." + name
-			capturedName := name // Capture for closure
+		return manager, nil
+	})
 
+	// Auto-register named connections in container
+	// This allows direct resolution via app.Make("database.analytics")
+	for name := range cfg.Connections {
+		connectionName := "database." + name
+
+		// Use a function to properly capture the loop variable
+		func(capturedName string) {
 			app.Singleton(connectionName, func() (interface{}, error) {
 				// Resolve manager to get connection
 				managerInstance, err := app.Make("database")
@@ -64,10 +68,8 @@ func (p *DatabaseServiceProvider) Register(app foundation.Application) error {
 				mgr := managerInstance.(*Manager)
 				return mgr.Connection(capturedName), nil
 			})
-		}
-
-		return manager, nil
-	})
+		}(name)
+	}
 
 	return nil
 }
