@@ -8,64 +8,64 @@ import (
 // Config holds the database configuration
 type Config struct {
 	// Driver: mysql, postgres, sqlite, sqlserver
-	Driver string
+	Driver string `mapstructure:"driver" config:"driver"`
 
 	// Connection details
-	Host     string
-	Port     int
-	Database string
-	Username string
-	Password string
+	Host     string `mapstructure:"host" config:"host"`
+	Port     int    `mapstructure:"port" config:"port"`
+	Database string `mapstructure:"database" config:"database"`
+	Username string `mapstructure:"username" config:"username"`
+	Password string `mapstructure:"password" config:"password"`
 
 	// SQLite specific
-	FilePath string
+	FilePath string `mapstructure:"file_path" config:"file_path"`
 
 	// Connection pool
-	MaxOpenConns    int
-	MaxIdleConns    int
-	ConnMaxLifetime time.Duration
-	ConnMaxIdleTime time.Duration
+	MaxOpenConns    int           `mapstructure:"max_open_conns" config:"max_open_conns"`
+	MaxIdleConns    int           `mapstructure:"max_idle_conns" config:"max_idle_conns"`
+	ConnMaxLifetime time.Duration `mapstructure:"conn_max_lifetime" config:"conn_max_lifetime"`
+	ConnMaxIdleTime time.Duration `mapstructure:"conn_max_idle_time" config:"conn_max_idle_time"`
 
 	// Options
-	Charset   string
-	Timezone  string
-	ParseTime bool
-	SSLMode   string
-	Schema    string // PostgreSQL schema (default: public), MySQL: not used
+	Charset   string `mapstructure:"charset" config:"charset"`
+	Timezone  string `mapstructure:"timezone" config:"timezone"`
+	ParseTime bool   `mapstructure:"parse_time" config:"parse_time"`
+	SSLMode   string `mapstructure:"ssl_mode" config:"ssl_mode"`
+	Schema    string `mapstructure:"schema" config:"schema"` // PostgreSQL schema (default: public), MySQL: not used
 
 	// Logging
-	LogLevel      string // silent, error, warn, info
-	SlowThreshold time.Duration
+	LogLevel      string        `mapstructure:"log_level" config:"log_level"` // silent, error, warn, info
+	SlowThreshold time.Duration `mapstructure:"slow_threshold" config:"slow_threshold"`
 
 	// Slow query logging
-	SlowQuery SlowQueryConfig
+	SlowQuery SlowQueryConfig `mapstructure:"slow_query" config:"slow_query"`
 
 	// Connection retry configuration
-	Retry RetryConfig
+	Retry RetryConfig `mapstructure:"retry" config:"retry"`
 
 	// Auto migration
-	AutoMigrate bool
-	Models      []interface{}
+	AutoMigrate bool          `mapstructure:"auto_migrate" config:"auto_migrate"`
+	Models      []interface{} `mapstructure:"-" config:"-"`
 
 	// ========== Read/Write Splitting ==========
-	ReadWriteSplitting bool
-	AutoRouting        bool // Automatic routing (default: true)
+	ReadWriteSplitting bool `mapstructure:"read_write_splitting" config:"read_write_splitting"`
+	AutoRouting        bool `mapstructure:"auto_routing" config:"auto_routing"`
 
 	// Master (write) connection
-	Master ConnectionConfig
+	Master ConnectionConfig `mapstructure:"master" config:"master"`
 
 	// Slaves (read) connections
-	Slaves []ConnectionConfig
+	Slaves []ConnectionConfig `mapstructure:"slaves" config:"slaves"`
 
 	// Load balancing strategy
-	SlaveStrategy string // round-robin, random, weighted
+	SlaveStrategy string `mapstructure:"slave_strategy" config:"slave_strategy"`
 
 	// ========== Multi-Connection Support ==========
 	// Named connections for multiple databases
-	Connections map[string]ConnectionConfig
+	Connections map[string]ConnectionConfig `mapstructure:"connections" config:"connections"`
 
 	// Default connection name
-	DefaultConnection string
+	DefaultConnection string `mapstructure:"default_connection" config:"default_connection"`
 }
 
 // SlowQueryConfig holds configuration for slow query logging.
