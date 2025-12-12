@@ -92,18 +92,30 @@ func (p *DatabaseServiceProvider) Shutdown(app foundation.Application) error {
 	return manager.Close()
 }
 
-// loggerAdapter adapts a generic logger to database.Logger interface.
-type loggerAdapter struct {
-	logger interface {
-		Info(msg string, keysAndValues ...interface{})
-		Warn(msg string, keysAndValues ...interface{})
-	}
-}
-
-func (l *loggerAdapter) Info(msg string, keysAndValues ...interface{}) {
-	l.logger.Info(msg, keysAndValues...)
-}
-
-func (l *loggerAdapter) Warn(msg string, keysAndValues ...interface{}) {
-	l.logger.Warn(msg, keysAndValues...)
-}
+// ========================================
+// Logger Integration (Future Enhancement)
+// ========================================
+// Uncomment and use this adapter when implementing logger integration.
+// This allows dg-database to use the application's logger for internal operations
+// like slow query logging, connection pool stats, etc.
+//
+// Usage example in Register():
+//   if loggerInstance, err := app.Make("logger"); err == nil {
+//       logger := &loggerAdapter{logger: loggerInstance}
+//       manager, err := NewManager(cfg, logger)
+//   }
+//
+// type loggerAdapter struct {
+// 	logger interface {
+// 		Info(msg string, keysAndValues ...interface{})
+// 		Warn(msg string, keysAndValues ...interface{})
+// 	}
+// }
+//
+// func (l *loggerAdapter) Info(msg string, keysAndValues ...interface{}) {
+// 	l.logger.Info(msg, keysAndValues...)
+// }
+//
+// func (l *loggerAdapter) Warn(msg string, keysAndValues ...interface{}) {
+// 	l.logger.Warn(msg, keysAndValues...)
+// }
