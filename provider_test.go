@@ -174,18 +174,18 @@ func TestServiceProvider_Boot_WithReadWriteSplitting(t *testing.T) {
 
 	config := Config{
 		Driver:             "sqlite",
-		Database:           ":memory:",
+		Name:           ":memory:",
 		ReadWriteSplitting: true,
 		AutoRouting:        true,
 		SlaveStrategy:      "round-robin",
 		Master: ConnectionConfig{
 			Driver:   "sqlite",
-			Database: ":memory:",
+			Name: ":memory:",
 		},
 		Slaves: []ConnectionConfig{
 			{
 				Driver:   "sqlite",
-				Database: ":memory:",
+				Name: ":memory:",
 			},
 		},
 	}
@@ -205,15 +205,15 @@ func TestServiceProvider_Boot_WithMultipleConnections(t *testing.T) {
 
 	config := Config{
 		Driver:   "sqlite",
-		Database: ":memory:",
+		Name: ":memory:",
 		Connections: map[string]ConnectionConfig{
 			"analytics": {
 				Driver:   "sqlite",
-				Database: ":memory:",
+				Name: ":memory:",
 			},
 			"logs": {
 				Driver:   "sqlite",
-				Database: ":memory:",
+				Name: ":memory:",
 			},
 		},
 	}
@@ -337,17 +337,17 @@ func TestServiceProvider_Boot_WithLogger_ReadWriteSplitting(t *testing.T) {
 
 	config := Config{
 		Driver:             "sqlite",
-		Database:           ":memory:",
+		Name:           ":memory:",
 		ReadWriteSplitting: true,
 		SlaveStrategy:      "round-robin",
 		Master: ConnectionConfig{
 			Driver:   "sqlite",
-			Database: ":memory:",
+			Name: ":memory:",
 		},
 		Slaves: []ConnectionConfig{
 			{
 				Driver:   "sqlite",
-				Database: ":memory:",
+				Name: ":memory:",
 			},
 		},
 	}
@@ -381,11 +381,11 @@ func TestServiceProvider_Boot_WithLogger_NamedConnections(t *testing.T) {
 
 	config := Config{
 		Driver:   "sqlite",
-		Database: ":memory:",
+		Name: ":memory:",
 		Connections: map[string]ConnectionConfig{
 			"analytics": {
 				Driver:   "sqlite",
-				Database: ":memory:",
+				Name: ":memory:",
 			},
 		},
 	}

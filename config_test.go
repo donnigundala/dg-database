@@ -45,8 +45,8 @@ func TestConfigFluentSetters(t *testing.T) {
 		t.Errorf("Expected port 5432, got %d", config.Port)
 	}
 
-	if config.Database != "testdb" {
-		t.Errorf("Expected database 'testdb', got '%s'", config.Database)
+	if config.Name != "testdb" {
+		t.Errorf("Expected database 'testdb', got '%s'", config.Name)
 	}
 
 	if config.Username != "user" {
@@ -63,14 +63,14 @@ func TestConfigReadWriteSplitting(t *testing.T) {
 		Driver:   "mysql",
 		Host:     "master.db.com",
 		Port:     3306,
-		Database: "mydb",
+		Name: "mydb",
 	}
 
 	slaveConfig := ConnectionConfig{
 		Driver:   "mysql",
 		Host:     "slave.db.com",
 		Port:     3306,
-		Database: "mydb",
+		Name: "mydb",
 	}
 
 	config := DefaultConfig().
@@ -97,7 +97,7 @@ func TestConfigMultiConnection(t *testing.T) {
 	analyticsConfig := ConnectionConfig{
 		Driver:   "postgres",
 		Host:     "analytics.db.com",
-		Database: "analytics",
+		Name: "analytics",
 	}
 
 	config := DefaultConfig().

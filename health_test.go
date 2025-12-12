@@ -39,20 +39,20 @@ func TestManager_DetailedHealthCheck(t *testing.T) {
 func TestManager_DetailedHealthCheck_WithReadWriteSplitting(t *testing.T) {
 	config := Config{
 		Driver:             "sqlite",
-		Database:           ":memory:",
+		Name:           ":memory:",
 		ReadWriteSplitting: true,
 		Master: ConnectionConfig{
 			Driver:   "sqlite",
-			Database: ":memory:",
+			Name: ":memory:",
 		},
 		Slaves: []ConnectionConfig{
 			{
 				Driver:   "sqlite",
-				Database: ":memory:",
+				Name: ":memory:",
 			},
 			{
 				Driver:   "sqlite",
-				Database: ":memory:",
+				Name: ":memory:",
 			},
 		},
 	}
@@ -81,15 +81,15 @@ func TestManager_DetailedHealthCheck_WithReadWriteSplitting(t *testing.T) {
 func TestManager_DetailedHealthCheck_WithNamedConnections(t *testing.T) {
 	config := Config{
 		Driver:   "sqlite",
-		Database: ":memory:",
+		Name: ":memory:",
 		Connections: map[string]ConnectionConfig{
 			"analytics": {
 				Driver:   "sqlite",
-				Database: ":memory:",
+				Name: ":memory:",
 			},
 			"logs": {
 				Driver:   "sqlite",
-				Database: ":memory:",
+				Name: ":memory:",
 			},
 		},
 	}

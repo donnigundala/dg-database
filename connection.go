@@ -20,7 +20,7 @@ func connect(config Config, log Logger) (*gorm.DB, error) {
 			Driver:    config.Driver,
 			Host:      config.Host,
 			Port:      config.Port,
-			Database:  config.Database,
+			Name:  config.Name,
 			Username:  config.Username,
 			Password:  config.Password,
 			FilePath:  config.FilePath,

@@ -12,7 +12,7 @@ func TestBuildMySQLDSN(t *testing.T) {
 		Driver:    "mysql",
 		Host:      "localhost",
 		Port:      3306,
-		Database:  "testdb",
+		Name:  "testdb",
 		Username:  "root",
 		Password:  "secret",
 		Charset:   "utf8mb4",
@@ -32,7 +32,7 @@ func TestBuildMySQLDSN_Defaults(t *testing.T) {
 		Driver:    "mysql",
 		Host:      "localhost",
 		Port:      3306,
-		Database:  "testdb",
+		Name:  "testdb",
 		Username:  "root",
 		Password:  "secret",
 		ParseTime: true, // Explicitly set to true
@@ -56,7 +56,7 @@ func TestBuildPostgresDSN(t *testing.T) {
 		Driver:   "postgres",
 		Host:     "localhost",
 		Port:     5432,
-		Database: "testdb",
+		Name: "testdb",
 		Username: "postgres",
 		Password: "secret",
 		SSLMode:  "disable",
@@ -76,7 +76,7 @@ func TestBuildPostgresDSN_Defaults(t *testing.T) {
 		Driver:   "postgres",
 		Host:     "localhost",
 		Port:     5432,
-		Database: "testdb",
+		Name: "testdb",
 		Username: "postgres",
 		Password: "secret",
 	}
@@ -112,7 +112,7 @@ func TestBuildDSNFromConnectionConfig_MySQL(t *testing.T) {
 		Driver:   "mysql",
 		Host:     "db.example.com",
 		Port:     3306,
-		Database: "mydb",
+		Name: "mydb",
 		Username: "user",
 		Password: "pass",
 	}
@@ -129,7 +129,7 @@ func TestBuildDSNFromConnectionConfig_Postgres(t *testing.T) {
 		Driver:   "postgres",
 		Host:     "pg.example.com",
 		Port:     5432,
-		Database: "pgdb",
+		Name: "pgdb",
 		Username: "pguser",
 		Password: "pgpass",
 	}

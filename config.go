@@ -13,7 +13,7 @@ type Config struct {
 	// Connection details
 	Host     string `mapstructure:"host" config:"host"`
 	Port     int    `mapstructure:"port" config:"port"`
-	Database string `mapstructure:"name" config:"name"`
+	Name     string `mapstructure:"name" config:"name"`
 	Username string `mapstructure:"username" config:"username"`
 	Password string `mapstructure:"password" config:"password"`
 
@@ -89,7 +89,7 @@ type ConnectionConfig struct {
 	Driver   string
 	Host     string
 	Port     int
-	Database string
+	Name     string
 	Username string
 	Password string
 
@@ -159,8 +159,8 @@ func (c Config) WithPort(port int) Config {
 }
 
 // WithDatabase sets the database name
-func (c Config) WithDatabase(database string) Config {
-	c.Database = database
+func (c Config) WithDatabase(name string) Config {
+	c.Name = name
 	return c
 }
 
@@ -283,7 +283,7 @@ func (c Config) Validate() error {
 		return fmt.Errorf("database host is required for driver %s", c.Driver)
 	}
 
-	if c.Driver == "sqlite" && c.FilePath == "" && c.Database == "" {
+	if c.Driver == "sqlite" && c.FilePath == "" && c.Name == "" {
 		return fmt.Errorf("database file path or database name is required for sqlite")
 	}
 

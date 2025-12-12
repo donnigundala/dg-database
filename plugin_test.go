@@ -48,22 +48,22 @@ func TestReadWritePlugin_ReadRouting(t *testing.T) {
 	// Create config with read/write splitting but AutoRouting disabled initially
 	config := Config{
 		Driver:             "sqlite",
-		Database:           ":memory:",
+		Name:           ":memory:",
 		ReadWriteSplitting: true,
 		AutoRouting:        false, // Disable during setup
 		SlaveStrategy:      "round-robin",
 		Master: ConnectionConfig{
 			Driver:   "sqlite",
-			Database: ":memory:",
+			Name: ":memory:",
 		},
 		Slaves: []ConnectionConfig{
 			{
 				Driver:   "sqlite",
-				Database: ":memory:",
+				Name: ":memory:",
 			},
 			{
 				Driver:   "sqlite",
-				Database: ":memory:",
+				Name: ":memory:",
 			},
 		},
 	}
@@ -105,7 +105,7 @@ func TestReadWritePlugin_WriteRouting(t *testing.T) {
 	// We're testing that Write() returns the master connection
 	config := Config{
 		Driver:   "sqlite",
-		Database: ":memory:",
+		Name: ":memory:",
 	}
 
 	manager, err := NewManager(config, nil)
@@ -139,17 +139,17 @@ func TestReadWritePlugin_LoadBalancing(t *testing.T) {
 	t.Run("round-robin strategy", func(t *testing.T) {
 		config := Config{
 			Driver:             "sqlite",
-			Database:           ":memory:",
+			Name:           ":memory:",
 			ReadWriteSplitting: true,
 			SlaveStrategy:      "round-robin",
 			Master: ConnectionConfig{
 				Driver:   "sqlite",
-				Database: ":memory:",
+				Name: ":memory:",
 			},
 			Slaves: []ConnectionConfig{
-				{Driver: "sqlite", Database: ":memory:"},
-				{Driver: "sqlite", Database: ":memory:"},
-				{Driver: "sqlite", Database: ":memory:"},
+				{Driver: "sqlite", Name: ":memory:"},
+				{Driver: "sqlite", Name: ":memory:"},
+				{Driver: "sqlite", Name: ":memory:"},
 			},
 		}
 
@@ -172,16 +172,16 @@ func TestReadWritePlugin_LoadBalancing(t *testing.T) {
 	t.Run("random strategy", func(t *testing.T) {
 		config := Config{
 			Driver:             "sqlite",
-			Database:           ":memory:",
+			Name:           ":memory:",
 			ReadWriteSplitting: true,
 			SlaveStrategy:      "random",
 			Master: ConnectionConfig{
 				Driver:   "sqlite",
-				Database: ":memory:",
+				Name: ":memory:",
 			},
 			Slaves: []ConnectionConfig{
-				{Driver: "sqlite", Database: ":memory:"},
-				{Driver: "sqlite", Database: ":memory:"},
+				{Driver: "sqlite", Name: ":memory:"},
+				{Driver: "sqlite", Name: ":memory:"},
 			},
 		}
 
@@ -199,16 +199,16 @@ func TestReadWritePlugin_LoadBalancing(t *testing.T) {
 	t.Run("weighted strategy", func(t *testing.T) {
 		config := Config{
 			Driver:             "sqlite",
-			Database:           ":memory:",
+			Name:           ":memory:",
 			ReadWriteSplitting: true,
 			SlaveStrategy:      "weighted",
 			Master: ConnectionConfig{
 				Driver:   "sqlite",
-				Database: ":memory:",
+				Name: ":memory:",
 			},
 			Slaves: []ConnectionConfig{
-				{Driver: "sqlite", Database: ":memory:", Weight: 3},
-				{Driver: "sqlite", Database: ":memory:", Weight: 1},
+				{Driver: "sqlite", Name: ":memory:", Weight: 3},
+				{Driver: "sqlite", Name: ":memory:", Weight: 1},
 			},
 		}
 
@@ -277,18 +277,18 @@ func TestIsWriteOperation(t *testing.T) {
 func TestReadWritePlugin_AutoRouting_ActualQueries(t *testing.T) {
 	config := Config{
 		Driver:             "sqlite",
-		Database:           ":memory:",
+		Name:           ":memory:",
 		ReadWriteSplitting: true,
 		AutoRouting:        true, // Enable auto routing
 		SlaveStrategy:      "round-robin",
 		Master: ConnectionConfig{
 			Driver:   "sqlite",
-			Database: ":memory:",
+			Name: ":memory:",
 		},
 		Slaves: []ConnectionConfig{
 			{
 				Driver:   "sqlite",
-				Database: ":memory:",
+				Name: ":memory:",
 			},
 		},
 	}
@@ -325,18 +325,18 @@ func TestReadWritePlugin_AutoRouting_ActualQueries(t *testing.T) {
 func TestReadWritePlugin_SystemTableDetection(t *testing.T) {
 	config := Config{
 		Driver:             "sqlite",
-		Database:           ":memory:",
+		Name:           ":memory:",
 		ReadWriteSplitting: true,
 		AutoRouting:        true,
 		SlaveStrategy:      "round-robin",
 		Master: ConnectionConfig{
 			Driver:   "sqlite",
-			Database: ":memory:",
+			Name: ":memory:",
 		},
 		Slaves: []ConnectionConfig{
 			{
 				Driver:   "sqlite",
-				Database: ":memory:",
+				Name: ":memory:",
 			},
 		},
 	}
@@ -361,18 +361,18 @@ func TestReadWritePlugin_SystemTableDetection(t *testing.T) {
 func TestReadWritePlugin_SkipRoutingContext(t *testing.T) {
 	config := Config{
 		Driver:             "sqlite",
-		Database:           ":memory:",
+		Name:           ":memory:",
 		ReadWriteSplitting: true,
 		AutoRouting:        true,
 		SlaveStrategy:      "round-robin",
 		Master: ConnectionConfig{
 			Driver:   "sqlite",
-			Database: ":memory:",
+			Name: ":memory:",
 		},
 		Slaves: []ConnectionConfig{
 			{
 				Driver:   "sqlite",
-				Database: ":memory:",
+				Name: ":memory:",
 			},
 		},
 	}
@@ -395,7 +395,7 @@ func TestReadWritePlugin_SkipRoutingContext(t *testing.T) {
 func TestReadWritePlugin_TransactionRouting(t *testing.T) {
 	config := Config{
 		Driver:   "sqlite",
-		Database: ":memory:",
+		Name: ":memory:",
 	}
 
 	manager, err := NewManager(config, nil)
@@ -433,11 +433,11 @@ func TestReadWritePlugin_TransactionRouting(t *testing.T) {
 func TestReadWritePlugin_NoSlaves(t *testing.T) {
 	config := Config{
 		Driver:             "sqlite",
-		Database:           ":memory:",
+		Name:           ":memory:",
 		ReadWriteSplitting: false, // No read/write splitting
 		Master: ConnectionConfig{
 			Driver:   "sqlite",
-			Database: ":memory:",
+			Name: ":memory:",
 		},
 	}
 

@@ -98,7 +98,7 @@ func (m *Manager) setupPrimaryConnection() error {
 
 	// Special handling for SQLite :memory: databases
 	// They must use a single connection because each connection has its own database
-	if m.config.Driver == "sqlite" && (m.config.Database == ":memory:" || m.config.FilePath == ":memory:") {
+	if m.config.Driver == "sqlite" && (m.config.Name == ":memory:" || m.config.FilePath == ":memory:") {
 		sqlDB.SetMaxOpenConns(1)
 		sqlDB.SetMaxIdleConns(1)
 	} else {

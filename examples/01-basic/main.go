@@ -27,7 +27,7 @@ func main() {
 	// Alternative: explicit configuration
 	// config := database.Config{
 	// 	Driver:   "sqlite",
-	// 	Database: ":memory:",
+	// 	Name: ":memory:",
 	// 	AutoMigrate: true,
 	// 	Models: []interface{}{&User{}},
 	// }

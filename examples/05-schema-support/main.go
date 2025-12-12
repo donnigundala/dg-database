@@ -26,7 +26,7 @@ func main() {
 		WithSchema("tenant_1") // Use tenant_1 schema
 
 	fmt.Println("\n1. Configuration with custom schema:")
-	fmt.Printf("   Database: %s\n", config.Database)
+	fmt.Printf("   Name: %s\n", config.Name)
 	fmt.Printf("   Schema: %s\n", config.Schema)
 
 	// Example 2: Multi-tenant with different schemas
@@ -34,7 +34,7 @@ func main() {
 		Driver:   "postgres",
 		Host:     "localhost",
 		Port:     5432,
-		Database: "myapp",
+		Name: "myapp",
 		Username: "user",
 		Password: "password",
 		Schema:   "public", // Default schema
@@ -45,7 +45,7 @@ func main() {
 				Driver:   "postgres",
 				Host:     "localhost",
 				Port:     5432,
-				Database: "myapp",
+				Name: "myapp",
 				Username: "user",
 				Password: "password",
 				Schema:   "tenant_1",
@@ -54,7 +54,7 @@ func main() {
 				Driver:   "postgres",
 				Host:     "localhost",
 				Port:     5432,
-				Database: "myapp",
+				Name: "myapp",
 				Username: "user",
 				Password: "password",
 				Schema:   "tenant_2",
@@ -104,7 +104,7 @@ func main() {
 			Driver:   "postgres",
 			Host:     "master.db.com",
 			Port:     5432,
-			Database: "myapp",
+			Name: "myapp",
 			Username: "user",
 			Password: "password",
 			Schema:   "tenant_1", // Master uses tenant_1 schema
@@ -115,7 +115,7 @@ func main() {
 				Driver:   "postgres",
 				Host:     "slave1.db.com",
 				Port:     5432,
-				Database: "myapp",
+				Name: "myapp",
 				Username: "user",
 				Password: "password",
 				Schema:   "tenant_1", // Slave also uses tenant_1 schema

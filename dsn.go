@@ -23,7 +23,7 @@ type DSNBuilder interface {
 func (c Config) GetDriver() string   { return c.Driver }
 func (c Config) GetHost() string     { return c.Host }
 func (c Config) GetPort() int        { return c.Port }
-func (c Config) GetDatabase() string { return c.Database }
+func (c Config) GetDatabase() string { return c.Name }
 func (c Config) GetUsername() string { return c.Username }
 func (c Config) GetPassword() string { return c.Password }
 func (c Config) GetCharset() string  { return c.Charset }
@@ -37,7 +37,7 @@ func (c Config) GetFilePath() string { return c.FilePath }
 func (c ConnectionConfig) GetDriver() string   { return c.Driver }
 func (c ConnectionConfig) GetHost() string     { return c.Host }
 func (c ConnectionConfig) GetPort() int        { return c.Port }
-func (c ConnectionConfig) GetDatabase() string { return c.Database }
+func (c ConnectionConfig) GetDatabase() string { return c.Name }
 func (c ConnectionConfig) GetUsername() string { return c.Username }
 func (c ConnectionConfig) GetPassword() string { return c.Password }
 func (c ConnectionConfig) GetCharset() string  { return c.Charset }

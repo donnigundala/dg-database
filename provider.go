@@ -24,7 +24,7 @@ func (p *DatabaseServiceProvider) Name() string {
 
 // Version returns the provider version
 func (p *DatabaseServiceProvider) Version() string {
-	return "1.5.3"
+	return "1.5.5"
 }
 
 // Dependencies returns the provider dependencies

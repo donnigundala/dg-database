@@ -34,15 +34,15 @@ func TestManager_Stats(t *testing.T) {
 func TestManager_ConnectionStats(t *testing.T) {
 	config := Config{
 		Driver:   "sqlite",
-		Database: ":memory:",
+		Name: ":memory:",
 		Connections: map[string]ConnectionConfig{
 			"analytics": {
 				Driver:   "sqlite",
-				Database: ":memory:",
+				Name: ":memory:",
 			},
 			"logs": {
 				Driver:   "sqlite",
-				Database: ":memory:",
+				Name: ":memory:",
 			},
 		},
 	}
@@ -67,11 +67,11 @@ func TestManager_ConnectionStats(t *testing.T) {
 func TestManager_AllStats(t *testing.T) {
 	config := Config{
 		Driver:   "sqlite",
-		Database: ":memory:",
+		Name: ":memory:",
 		Connections: map[string]ConnectionConfig{
 			"analytics": {
 				Driver:   "sqlite",
-				Database: ":memory:",
+				Name: ":memory:",
 			},
 		},
 	}
@@ -96,20 +96,20 @@ func TestManager_AllStats(t *testing.T) {
 func TestManager_AllStats_WithReadWriteSplitting(t *testing.T) {
 	config := Config{
 		Driver:             "sqlite",
-		Database:           ":memory:",
+		Name:           ":memory:",
 		ReadWriteSplitting: true,
 		Master: ConnectionConfig{
 			Driver:   "sqlite",
-			Database: ":memory:",
+			Name: ":memory:",
 		},
 		Slaves: []ConnectionConfig{
 			{
 				Driver:   "sqlite",
-				Database: ":memory:",
+				Name: ":memory:",
 			},
 			{
 				Driver:   "sqlite",
-				Database: ":memory:",
+				Name: ":memory:",
 			},
 		},
 	}

@@ -34,7 +34,7 @@ func main() {
 	// Configure multiple named connections
 	config := database.Config{
 		Driver:   "sqlite",
-		Database: ":memory:",
+		Name: ":memory:",
 
 		// Named connections
 		Connections: map[string]database.ConnectionConfig{

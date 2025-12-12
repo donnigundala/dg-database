@@ -21,7 +21,7 @@ func main() {
 	// Configure read/write splitting
 	config := database.Config{
 		Driver:             "sqlite",
-		Database:           ":memory:",
+		Name:           ":memory:",
 		ReadWriteSplitting: true,
 		AutoRouting:        true, // Automatic routing enabled!
 		SlaveStrategy:      "round-robin",
