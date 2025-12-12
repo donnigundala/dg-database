@@ -2,8 +2,6 @@ package database
 
 import (
 	"fmt"
-	"os"
-	"strconv"
 
 	"github.com/donnigundala/dg-core/contracts/foundation"
 )
@@ -15,8 +13,8 @@ import (
 // use the library functions (NewManager) directly.
 type DatabaseServiceProvider struct {
 	// Config holds database configuration
-	// Auto-injected by dg-core if using config:"database" tag
-	Config Config `config:"database"`
+	// Auto-injected by dg-core if using config:"db" tag
+	Config Config `config:"db"`
 }
 
 // Name returns the provider name
@@ -26,7 +24,7 @@ func (p *DatabaseServiceProvider) Name() string {
 
 // Version returns the provider version
 func (p *DatabaseServiceProvider) Version() string {
-	return "1.5.0"
+	return "1.5.3"
 }
 
 // Dependencies returns the provider dependencies
@@ -40,31 +38,6 @@ func (p *DatabaseServiceProvider) Register(app foundation.Application) error {
 	cfg := p.Config
 	if cfg.Driver == "" {
 		cfg = DefaultConfig()
-	}
-
-	// Override with legacy DB_* env vars if present (Convenience)
-	if driver := os.Getenv("DB_DRIVER"); driver != "" {
-		cfg.Driver = driver
-	}
-	if host := os.Getenv("DB_HOST"); host != "" {
-		cfg.Host = host
-	}
-	if portVal := os.Getenv("DB_PORT"); portVal != "" {
-		if p, err := strconv.Atoi(portVal); err == nil {
-			cfg.Port = p
-		}
-	}
-	if db := os.Getenv("DB_DATABASE"); db != "" {
-		cfg.Database = db
-	}
-	if user := os.Getenv("DB_USERNAME"); user != "" {
-		cfg.Username = user
-	}
-	if pass := os.Getenv("DB_PASSWORD"); pass != "" {
-		cfg.Password = pass
-	}
-	if schema := os.Getenv("DB_SCHEMA"); schema != "" {
-		cfg.Schema = schema
 	}
 
 	// Register database manager
