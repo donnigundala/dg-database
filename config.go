@@ -13,7 +13,7 @@ type Config struct {
 	// Connection details
 	Host     string `mapstructure:"host" config:"host"`
 	Port     int    `mapstructure:"port" config:"port"`
-	Database string `mapstructure:"database" config:"database"`
+	Database string `mapstructure:"name" config:"name"`
 	Username string `mapstructure:"username" config:"username"`
 	Password string `mapstructure:"password" config:"password"`
 
