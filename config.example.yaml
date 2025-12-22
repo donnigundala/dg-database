@@ -1,0 +1,38 @@
+database:
+  # Default database connection settings.
+  driver: "mysql"
+  host: "localhost"
+  port: 3306
+  database: "myapp"
+  username: "user"
+  password: "password"
+  charset: "utf8mb4"
+  parse_time: true
+  timezone: "Local"
+
+  # Connection Pool settings.
+  max_open_conns: 100
+  max_idle_conns: 10
+  conn_max_lifetime: 1h
+  conn_max_idle_time: 10m
+
+  # Auto Migration settings.
+  auto_migrate: true
+
+  # Read/Write Splitting.
+  read_write_splitting: false
+  # SlaveStrategy: round-robin, random, weighted
+  slave_strategy: "round-robin"
+
+  # Additional named connections.
+  connections:
+    analytics:
+      driver: "postgres"
+      host: "analytics.db.com"
+      database: "analytics"
+      username: "admin"
+      password: "secretpassword"
+    
+    local_data:
+      driver: "sqlite"
+      database: "storage/database.sqlite"

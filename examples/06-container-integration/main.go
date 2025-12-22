@@ -5,7 +5,7 @@ import (
 	"log"
 
 	"github.com/donnigundala/dg-core/foundation"
-	database "github.com/donnigundala/dg-database"
+	dgdatabase "github.com/donnigundala/dg-database"
 )
 
 // User model
@@ -36,12 +36,12 @@ func main() {
 	app := foundation.New(".")
 
 	// 2. Configure database with named connections
-	config := database.Config{
+	config := dgdatabase.Config{
 		Driver:   "sqlite",
 		FilePath: "./primary.db",
 
 		// Named connections - automatically registered in container!
-		Connections: map[string]database.ConnectionConfig{
+		Connections: map[string]dgdatabase.ConnectionConfig{
 			"analytics": {
 				Driver:   "sqlite",
 				FilePath: "./analytics.db",
@@ -54,7 +54,7 @@ func main() {
 	}
 
 	// 3. Register provider
-	provider := &database.DatabaseServiceProvider{Config: config}
+	provider := &dgdatabase.DatabaseServiceProvider{Config: config}
 	if err := app.Register(provider); err != nil {
 		log.Fatal(err)
 	}
@@ -64,13 +64,13 @@ func main() {
 	}
 
 	// 4. Auto-migrate models
-	db, _ := database.Resolve(app)
+	db, _ := dgdatabase.Resolve(app)
 	db.DB().AutoMigrate(&User{})
 
-	analyticsDB, _ := database.ResolveConnection(app, "analytics")
+	analyticsDB, _ := dgdatabase.ResolveConnection(app, "analytics")
 	analyticsDB.AutoMigrate(&AnalyticsEvent{})
 
-	auditDB, _ := database.ResolveConnection(app, "audit")
+	auditDB, _ := dgdatabase.ResolveConnection(app, "audit")
 	auditDB.AutoMigrate(&AuditLog{})
 
 	fmt.Println("✅ Databases initialized and migrated")
@@ -79,11 +79,11 @@ func main() {
 	// Pattern 1: Direct Resolution from Container
 	// ========================================
 	fmt.Println("--- Pattern 1: Direct Resolution ---")
-	directAnalytics, err := app.Make("database.analytics")
+	directAnalytics, err := app.Make("dgdatabase.analytics")
 	if err != nil {
 		log.Fatal(err)
 	}
-	analyticsConn := directAnalytics.(*database.Manager).Connection("analytics")
+	analyticsConn := directAnalytics.(*dgdatabase.Manager).Connection("analytics")
 
 	event := &AnalyticsEvent{
 		UserID: 1,
@@ -98,7 +98,7 @@ func main() {
 	fmt.Println("--- Pattern 2: Helper Functions ---")
 
 	// Main database
-	mainDB, err := database.Resolve(app)
+	mainDB, err := dgdatabase.Resolve(app)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -111,7 +111,7 @@ func main() {
 	fmt.Printf("✅ Created user via Resolve(): %+v\n", user)
 
 	// Named connection
-	auditConnection, err := database.ResolveConnection(app, "audit")
+	auditConnection, err := dgdatabase.ResolveConnection(app, "audit")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -142,7 +142,7 @@ func main() {
 	fmt.Printf("Total users in primary DB: %d\n", len(users))
 
 	var events []AnalyticsEvent
-	analyticsConnection, _ := database.ResolveConnection(app, "analytics")
+	analyticsConnection, _ := dgdatabase.ResolveConnection(app, "analytics")
 	analyticsConnection.Find(&events)
 	fmt.Printf("Total events in analytics DB: %d\n", len(events))
 
@@ -158,12 +158,12 @@ func main() {
 // ========================================
 
 type UserService struct {
-	inject *database.Injectable
+	inject *dgdatabase.Injectable
 }
 
 func NewUserService(app *foundation.Application) *UserService {
 	return &UserService{
-		inject: database.NewInjectable(app),
+		inject: dgdatabase.NewInjectable(app),
 	}
 }
 

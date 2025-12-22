@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	database "github.com/donnigundala/dg-database"
+	dgdatabase "github.com/donnigundala/dg-database"
 	"gorm.io/gorm"
 )
 
@@ -18,19 +18,19 @@ type User struct {
 func main() {
 	fmt.Println("=== Migration Example ===")
 
-	config := database.Config{
+	config := dgdatabase.Config{
 		Driver:   "sqlite",
 		FilePath: "test.db",
 	}
 
-	manager, err := database.NewManager(config, nil)
+	manager, err := dgdatabase.NewManager(config, nil)
 	if err != nil {
 		log.Fatalf("Failed to create manager: %v", err)
 	}
 	defer manager.Close()
 
 	// Define migrations
-	migrations := []database.Migration{
+	migrations := []dgdatabase.Migration{
 		{
 			ID: "001_create_users_table",
 			Up: func(db *gorm.DB) error {

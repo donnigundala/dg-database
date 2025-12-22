@@ -1,4 +1,4 @@
-package database
+package dgdatabase
 
 import (
 	"fmt"
@@ -20,7 +20,7 @@ func connect(config Config, log Logger) (*gorm.DB, error) {
 			Driver:    config.Driver,
 			Host:      config.Host,
 			Port:      config.Port,
-			Name:  config.Name,
+			Name:      config.Name,
 			Username:  config.Username,
 			Password:  config.Password,
 			FilePath:  config.FilePath,
@@ -52,7 +52,7 @@ func connect(config Config, log Logger) (*gorm.DB, error) {
 
 	// Configure GORM
 	gormConfig := &gorm.Config{
-		Logger: getLogger(config.LogLevel, config.SlowThreshold),
+		Logger: createGormLogger(log, config.LogLevel, config.SlowThreshold),
 	}
 
 	// Open connection
@@ -84,7 +84,7 @@ func connectWithConfig(config ConnectionConfig, log Logger) (*gorm.DB, error) {
 
 	// Configure GORM
 	gormConfig := &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Silent),
+		Logger: createGormLogger(log, "warn", 200*time.Millisecond), // Default slow threshold for named connections
 	}
 
 	// Open connection
@@ -112,8 +112,8 @@ func connectWithConfig(config ConnectionConfig, log Logger) (*gorm.DB, error) {
 	return db, nil
 }
 
-// getLogger returns a GORM logger based on log level.
-func getLogger(logLevel string, slowThreshold time.Duration) logger.Interface {
+// createGormLogger returns a GORM logger based on log level.
+func createGormLogger(log Logger, logLevel string, slowThreshold time.Duration) logger.Interface {
 	var level logger.LogLevel
 
 	switch logLevel {
@@ -129,5 +129,5 @@ func getLogger(logLevel string, slowThreshold time.Duration) logger.Interface {
 		level = logger.Warn
 	}
 
-	return logger.Default.LogMode(level)
+	return NewGormLogger(log, level, slowThreshold)
 }

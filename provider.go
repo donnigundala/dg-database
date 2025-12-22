@@ -1,7 +1,8 @@
-package database
+package dgdatabase
 
 import (
 	"fmt"
+	"reflect"
 
 	"github.com/donnigundala/dg-core/contracts/foundation"
 )
@@ -13,18 +14,23 @@ import (
 // use the library functions (NewManager) directly.
 type DatabaseServiceProvider struct {
 	// Config holds database configuration
-	// Auto-injected by dg-core if using config:"db" tag
-	Config Config `config:"db"`
+	// Auto-injected by dg-core if using config:"database" tag
+	Config Config `config:"database"`
+}
+
+// NewDatabaseServiceProvider creates a new database service provider.
+func NewDatabaseServiceProvider() *DatabaseServiceProvider {
+	return &DatabaseServiceProvider{}
 }
 
 // Name returns the provider name
 func (p *DatabaseServiceProvider) Name() string {
-	return "database"
+	return Binding
 }
 
 // Version returns the provider version
 func (p *DatabaseServiceProvider) Version() string {
-	return "1.5.5"
+	return Version
 }
 
 // Dependencies returns the provider dependencies
@@ -32,19 +38,32 @@ func (p *DatabaseServiceProvider) Dependencies() []string {
 	return []string{}
 }
 
-// Register registers the database services
+// Register registers the database services into the container.
 func (p *DatabaseServiceProvider) Register(app foundation.Application) error {
-	// Use provided config or default
-	cfg := p.Config
-	if cfg.Driver == "" {
-		cfg = DefaultConfig()
-	}
-
 	// Register database manager
-	app.Singleton("database", func() (interface{}, error) {
-		// Create manager without logger
-		// Logger will be injected separately if needed
-		manager, err := NewManager(cfg, nil)
+	app.Singleton(Binding, func() (interface{}, error) {
+		// Use provided config or default
+		cfg := p.Config
+		if cfg.Driver == "" {
+			cfg = DefaultConfig()
+		}
+
+		var loggerInstance Logger
+		// Try to resolve logger from container
+		if log, err := app.Make("logger"); err == nil {
+			// Adapt the logger to our Logger interface
+			if adapted, ok := log.(interface {
+				Debug(msg string, args ...interface{})
+				Info(msg string, args ...interface{})
+				Warn(msg string, args ...interface{})
+				Error(msg string, args ...interface{})
+			}); ok {
+				loggerInstance = &loggerAdapter{logger: adapted}
+			}
+		}
+
+		// Create manager with resolved logger (or nil)
+		manager, err := NewManager(cfg, loggerInstance)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create database manager: %w", err)
 		}
@@ -54,14 +73,14 @@ func (p *DatabaseServiceProvider) Register(app foundation.Application) error {
 
 	// Auto-register named connections in container
 	// This allows direct resolution via app.Make("database.analytics")
-	for name := range cfg.Connections {
-		connectionName := "database." + name
+	for name := range p.Config.Connections {
+		connectionName := Binding + "." + name
 
 		// Use a function to properly capture the loop variable
 		func(capturedName string) {
 			app.Singleton(connectionName, func() (interface{}, error) {
 				// Resolve manager to get connection
-				managerInstance, err := app.Make("database")
+				managerInstance, err := app.Make(Binding)
 				if err != nil {
 					return nil, fmt.Errorf("failed to resolve database manager: %w", err)
 				}
@@ -76,14 +95,28 @@ func (p *DatabaseServiceProvider) Register(app foundation.Application) error {
 
 // Boot boots the database services
 func (p *DatabaseServiceProvider) Boot(app foundation.Application) error {
-	// Database will be resolved when needed
-	// No need to verify resolution here to avoid deadlock
+	// Try to resolve manager and register metrics
+	instance, err := app.Make(Binding)
+	if err == nil {
+		if manager, ok := instance.(*Manager); ok {
+			if err := manager.RegisterMetrics(); err != nil {
+				// We don't fail boot if metrics fail, just log it
+				if log, err := app.Make("logger"); err == nil {
+					if l, ok := log.(interface {
+						Warn(msg string, args ...interface{})
+					}); ok {
+						l.Warn("Failed to register database metrics", "error", err)
+					}
+				}
+			}
+		}
+	}
 	return nil
 }
 
 // Shutdown gracefully closes database connections.
 func (p *DatabaseServiceProvider) Shutdown(app foundation.Application) error {
-	dbInstance, err := app.Make("database")
+	dbInstance, err := app.Make(Binding)
 	if err != nil {
 		return nil // Database not initialized
 	}
@@ -92,30 +125,52 @@ func (p *DatabaseServiceProvider) Shutdown(app foundation.Application) error {
 	return manager.Close()
 }
 
-// ========================================
-// Logger Integration (Future Enhancement)
-// ========================================
-// Uncomment and use this adapter when implementing logger integration.
-// This allows dg-database to use the application's logger for internal operations
-// like slow query logging, connection pool stats, etc.
-//
-// Usage example in Register():
-//   if loggerInstance, err := app.Make("logger"); err == nil {
-//       logger := &loggerAdapter{logger: loggerInstance}
-//       manager, err := NewManager(cfg, logger)
-//   }
-//
-// type loggerAdapter struct {
-// 	logger interface {
-// 		Info(msg string, keysAndValues ...interface{})
-// 		Warn(msg string, keysAndValues ...interface{})
-// 	}
-// }
-//
-// func (l *loggerAdapter) Info(msg string, keysAndValues ...interface{}) {
-// 	l.logger.Info(msg, keysAndValues...)
-// }
-//
-// func (l *loggerAdapter) Warn(msg string, keysAndValues ...interface{}) {
-// 	l.logger.Warn(msg, keysAndValues...)
-// }
+// loggerAdapter adapts a generic logger to database.Logger interface.
+type loggerAdapter struct {
+	logger interface {
+		Debug(msg string, args ...interface{})
+		Info(msg string, args ...interface{})
+		Warn(msg string, args ...interface{})
+		Error(msg string, args ...interface{})
+	}
+}
+
+func (l *loggerAdapter) Debug(msg string, args ...interface{}) {
+	l.logger.Debug(msg, args...)
+}
+
+func (l *loggerAdapter) Info(msg string, args ...interface{}) {
+	l.logger.Info(msg, args...)
+}
+
+func (l *loggerAdapter) Warn(msg string, args ...interface{}) {
+	l.logger.Warn(msg, args...)
+}
+
+func (l *loggerAdapter) Error(msg string, args ...interface{}) {
+	l.logger.Error(msg, args...)
+}
+
+func (l *loggerAdapter) With(args ...interface{}) Logger {
+	// Try to call With(args...) via reflection to support different return types
+	v := reflect.ValueOf(l.logger)
+	m := v.MethodByName("With")
+	if m.IsValid() {
+		valArgs := make([]reflect.Value, len(args))
+		for i, arg := range args {
+			valArgs[i] = reflect.ValueOf(arg)
+		}
+		results := m.Call(valArgs)
+		if len(results) == 1 {
+			if nextLogger, ok := results[0].Interface().(interface {
+				Debug(msg string, args ...interface{})
+				Info(msg string, args ...interface{})
+				Warn(msg string, args ...interface{})
+				Error(msg string, args ...interface{})
+			}); ok {
+				return &loggerAdapter{logger: nextLogger}
+			}
+		}
+	}
+	return l
+}

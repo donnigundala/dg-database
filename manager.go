@@ -1,4 +1,4 @@
-package database
+package dgdatabase
 
 import (
 	"context"
@@ -8,6 +8,7 @@ import (
 	"sync"
 	"time"
 
+	"go.opentelemetry.io/otel/metric"
 	"gorm.io/gorm"
 )
 
@@ -35,6 +36,13 @@ type Manager struct {
 	// ========== Multi-Connection Support ==========
 	connections map[string]*gorm.DB
 	connMu      sync.RWMutex
+
+	// ========== Observability ==========
+	metricOpen         metric.Int64ObservableGauge
+	metricInUse        metric.Int64ObservableGauge
+	metricIdle         metric.Int64ObservableGauge
+	metricWaitCount    metric.Int64ObservableGauge
+	metricWaitDuration metric.Float64ObservableGauge
 }
 
 // NewManager creates a new database manager with the given configuration and logger.

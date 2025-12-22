@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	database "github.com/donnigundala/dg-database"
+	dgdatabase "github.com/donnigundala/dg-database"
 	"gorm.io/gorm"
 )
 
@@ -19,13 +19,13 @@ func main() {
 	fmt.Println("=== Basic Single Connection Example ===")
 
 	// Create configuration
-	config := database.DefaultConfig().
+	config := dgdatabase.DefaultConfig().
 		WithDriver("sqlite").
 		WithDatabase(":memory:").
 		WithAutoMigrate(&User{})
 
 	// Alternative: explicit configuration
-	// config := database.Config{
+	// config := dgdatabase.Config{
 	// 	Driver:   "sqlite",
 	// 	Name: ":memory:",
 	// 	AutoMigrate: true,
@@ -33,7 +33,7 @@ func main() {
 	// }
 
 	// Create manager
-	manager, err := database.NewManager(config, nil)
+	manager, err := dgdatabase.NewManager(config, nil)
 	if err != nil {
 		log.Fatalf("Failed to create manager: %v", err)
 	}

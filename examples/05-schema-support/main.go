@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	database "github.com/donnigundala/dg-database"
+	dgdatabase "github.com/donnigundala/dg-database"
 )
 
 // User model
@@ -17,7 +17,7 @@ func main() {
 	fmt.Println("=== PostgreSQL Schema Support Example ===")
 
 	// Example 1: Using custom schema
-	config := database.DefaultConfig().
+	config := dgdatabase.DefaultConfig().
 		WithDriver("postgres").
 		WithHost("localhost").
 		WithPort(5432).
@@ -30,7 +30,7 @@ func main() {
 	fmt.Printf("   Schema: %s\n", config.Schema)
 
 	// Example 2: Multi-tenant with different schemas
-	multiTenantConfig := database.Config{
+	multiTenantConfig := dgdatabase.Config{
 		Driver:   "postgres",
 		Host:     "localhost",
 		Port:     5432,
@@ -40,7 +40,7 @@ func main() {
 		Schema:   "public", // Default schema
 
 		// Each tenant gets their own schema
-		Connections: map[string]database.ConnectionConfig{
+		Connections: map[string]dgdatabase.ConnectionConfig{
 			"tenant_1": {
 				Driver:   "postgres",
 				Host:     "localhost",
@@ -70,7 +70,7 @@ func main() {
 
 	// Example 3: Usage with manager (commented out - requires actual PostgreSQL)
 	/*
-		manager, err := database.NewManager(config, nil)
+		manager, err := dgdatabase.NewManager(config, nil)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -95,12 +95,12 @@ func main() {
 	fmt.Println("   - public schema: shared configuration tables")
 
 	// Example 5: Read/Write splitting with schemas
-	rwConfig := database.Config{
+	rwConfig := dgdatabase.Config{
 		Driver:             "postgres",
 		ReadWriteSplitting: true,
 		AutoRouting:        true,
 
-		Master: database.ConnectionConfig{
+		Master: dgdatabase.ConnectionConfig{
 			Driver:   "postgres",
 			Host:     "master.db.com",
 			Port:     5432,
@@ -110,7 +110,7 @@ func main() {
 			Schema:   "tenant_1", // Master uses tenant_1 schema
 		},
 
-		Slaves: []database.ConnectionConfig{
+		Slaves: []dgdatabase.ConnectionConfig{
 			{
 				Driver:   "postgres",
 				Host:     "slave1.db.com",

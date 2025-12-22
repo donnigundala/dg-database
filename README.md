@@ -448,6 +448,26 @@ if stats.WaitCount > 1000 {
 }
 ```
 
+### OpenTelemetry Integration [NEW]
+
+`dg-database` is instrumented with OpenTelemetry metrics. If `dg-observability` is registered and enabled, the following metrics are automatically collected from all active connections via asynchronous observers:
+
+*   `db.client.connections.open`: Gauge (labels: `db.connection_name`)
+*   `db.client.connections.in_use`: Gauge (labels: `db.connection_name`)
+*   `db.client.connections.idle`: Gauge (labels: `db.connection_name`)
+*   `db.client.connections.wait_count`: Gauge (labels: `db.connection_name`)
+*   `db.client.connections.wait_duration`: Gauge (labels: `db.connection_name`) - measured in milliseconds.
+
+To enable observability, ensure the `dg-observability` plugin is registered and configured:
+
+```yaml
+observability:
+  enabled: true
+  service_name: "my-app"
+```
+
+The metrics are automatically registered on application boot. No manual registration is required.
+
 ## Features Guide
 
 ### Transactions

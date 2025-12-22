@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	database "github.com/donnigundala/dg-database"
+	dgdatabase "github.com/donnigundala/dg-database"
 	"gorm.io/gorm"
 )
 
@@ -19,7 +19,7 @@ func main() {
 	fmt.Println("=== Read/Write Splitting Example ===")
 
 	// Configure read/write splitting
-	config := database.Config{
+	config := dgdatabase.Config{
 		Driver:             "sqlite",
 		Name:           ":memory:",
 		ReadWriteSplitting: true,
@@ -27,13 +27,13 @@ func main() {
 		SlaveStrategy:      "round-robin",
 
 		// Master configuration
-		Master: database.ConnectionConfig{
+		Master: dgdatabase.ConnectionConfig{
 			Driver:   "sqlite",
 			FilePath: ":memory:",
 		},
 
 		// Slave configurations
-		Slaves: []database.ConnectionConfig{
+		Slaves: []dgdatabase.ConnectionConfig{
 			{Driver: "sqlite", FilePath: ":memory:", Weight: 2},
 			{Driver: "sqlite", FilePath: ":memory:", Weight: 1},
 		},
@@ -42,7 +42,7 @@ func main() {
 		Models:      []interface{}{&Product{}},
 	}
 
-	manager, err := database.NewManager(config, nil)
+	manager, err := dgdatabase.NewManager(config, nil)
 	if err != nil {
 		log.Fatalf("Failed to create manager: %v", err)
 	}

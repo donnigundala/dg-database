@@ -1,4 +1,4 @@
-package database
+package dgdatabase
 
 import (
 	"testing"
@@ -14,12 +14,24 @@ type mockSlowQueryLogger struct {
 	infos    []string
 }
 
+func (m *mockSlowQueryLogger) Debug(msg string, args ...interface{}) {
+	// Not needed for current tests
+}
+
 func (m *mockSlowQueryLogger) Warn(msg string, args ...interface{}) {
 	m.warnings = append(m.warnings, msg)
 }
 
 func (m *mockSlowQueryLogger) Info(msg string, args ...interface{}) {
 	m.infos = append(m.infos, msg)
+}
+
+func (m *mockSlowQueryLogger) Error(msg string, args ...interface{}) {
+	// Not needed for current tests
+}
+
+func (m *mockSlowQueryLogger) With(args ...interface{}) Logger {
+	return m
 }
 
 // TestSlowQueryPlugin_Metadata tests the plugin metadata

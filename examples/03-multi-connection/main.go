@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	database "github.com/donnigundala/dg-database"
+	dgdatabase "github.com/donnigundala/dg-database"
 )
 
 // Order model
@@ -32,12 +32,12 @@ func main() {
 	fmt.Println("=== Multi-Connection Example ===")
 
 	// Configure multiple named connections
-	config := database.Config{
+	config := dgdatabase.Config{
 		Driver:   "sqlite",
 		Name: ":memory:",
 
 		// Named connections
-		Connections: map[string]database.ConnectionConfig{
+		Connections: map[string]dgdatabase.ConnectionConfig{
 			"analytics": {
 				Driver:   "sqlite",
 				FilePath: ":memory:",
@@ -52,7 +52,7 @@ func main() {
 		Models:      []interface{}{&Order{}},
 	}
 
-	manager, err := database.NewManager(config, nil)
+	manager, err := dgdatabase.NewManager(config, nil)
 	if err != nil {
 		log.Fatalf("Failed to create manager: %v", err)
 	}
@@ -114,7 +114,7 @@ func main() {
 
 	// Add new connection at runtime
 	fmt.Println("\n1. Adding 'cache' connection...")
-	cacheConfig := database.ConnectionConfig{
+	cacheConfig := dgdatabase.ConnectionConfig{
 		Driver:   "sqlite",
 		FilePath: ":memory:",
 	}
