@@ -21,7 +21,7 @@ func main() {
 	// Configure read/write splitting
 	config := dgdatabase.Config{
 		Driver:             "sqlite",
-		Name:           ":memory:",
+		FilePath:           ":memory:",
 		ReadWriteSplitting: true,
 		AutoRouting:        true, // Automatic routing enabled!
 		SlaveStrategy:      "round-robin",

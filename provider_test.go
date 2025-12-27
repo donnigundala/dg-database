@@ -22,7 +22,7 @@ func TestServiceProvider_Metadata(t *testing.T) {
 	// Test Version
 	version := provider.Version()
 	assert.NotEmpty(t, version, "Provider version should not be empty")
-	assert.Equal(t, "1.5.5", version, "Provider version should be 1.5.5")
+	assert.Equal(t, "1.6.0", version, "Provider version should be 1.6.0")
 
 	// Test Dependencies
 	deps := provider.Dependencies()

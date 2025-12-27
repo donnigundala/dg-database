@@ -95,22 +95,6 @@ func (p *DatabaseServiceProvider) Register(app foundation.Application) error {
 
 // Boot boots the database services
 func (p *DatabaseServiceProvider) Boot(app foundation.Application) error {
-	// Try to resolve manager and register metrics
-	instance, err := app.Make(Binding)
-	if err == nil {
-		if manager, ok := instance.(*Manager); ok {
-			if err := manager.RegisterMetrics(); err != nil {
-				// We don't fail boot if metrics fail, just log it
-				if log, err := app.Make("logger"); err == nil {
-					if l, ok := log.(interface {
-						Warn(msg string, args ...interface{})
-					}); ok {
-						l.Warn("Failed to register database metrics", "error", err)
-					}
-				}
-			}
-		}
-	}
 	return nil
 }
 

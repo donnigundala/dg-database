@@ -43,42 +43,36 @@ go get github.com/donnigundala/dg-database
 
 ## Quick Start
 
-### Basic Usage
-
 ```go
 package main
 
 import (
-    "fmt"
     "log"
-    
-    database "github.com/donnigundala/dg-database"
     "github.com/donnigundala/dg-core/foundation"
+    database "github.com/donnigundala/dg-database"
 )
 
 func main() {
-    // Create application
-    app := foundation.NewApplication()
+    app := foundation.New(".")
     
-    // Configure database
-    config := database.DefaultConfig().
-        WithDriver("mysql").
-        WithHost("localhost").
-        WithPort(3306).
-        WithDatabase("myapp").
-        WithCredentials("user", "password")
+    // Register provider (uses 'database' key in config)
+    app.Register(database.NewDatabaseServiceProvider())
     
-    // Register provider
-    provider := database.NewServiceProvider(config)
-    app.Register(provider)
-    app.Boot()
-    
-    // Get database manager
-    db := app.Make("db").(*database.Manager)
-    
-    // Use database
-    var users []User
-    db.DB().Find(&users)
+    if err := app.Boot(); err != nil {
+        log.Fatal(err)
+    }
+}
+```
+
+### Integration via InfrastructureSuite
+In your `bootstrap/app.go`, you typically use the declarative suite pattern:
+
+```go
+func InfrastructureSuite(workerMode bool) []foundation.ServiceProvider {
+	return []foundation.ServiceProvider{
+		dgdatabase.NewDatabaseServiceProvider(),
+		// ... other providers
+	}
 }
 ```
 
@@ -211,6 +205,36 @@ func (s *UserService) TrackUser(user *User) {
 
 
 ## Configuration
+
+The plugin uses the `database` key in your configuration file.
+
+### Configuration Mapping (YAML vs ENV)
+
+| YAML Key | Environment Variable | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `database.driver` | `DB_DRIVER` | `mysql` | `mysql`, `postgres`, `sqlite` |
+| `database.host` | `DB_HOST` | `localhost` | Database host |
+| `database.port` | `DB_PORT` | `3306` | Database port |
+| `database.name` | `DB_NAME` | - | Database name |
+| `database.username` | `DB_USERNAME` | - | Database username |
+| `database.password` | `DB_PASSWORD` | - | Database password |
+| `database.schema` | `DB_SCHEMA` | `public` | Postgres schema |
+| `database.max_open_conns` | `DB_MAX_OPEN_CONNS` | `100` | Max open connections |
+| `database.max_idle_conns` | `DB_MAX_IDLE_CONNS` | `10` | Max idle connections |
+| `database.conn_max_lifetime` | `DB_CONN_MAX_LIFETIME` | `1h` | Lifecycle (duration) |
+| `database.auto_migrate` | `DB_AUTO_MIGRATE` | `true` | Enable auto-migration |
+
+### Example YAML
+
+```yaml
+database:
+  driver: "postgres"
+  host: "localhost"
+  port: 5432
+  name: "myapp"
+  auto_migrate: true
+  max_open_conns: 100
+```
 
 ### Basic Configuration
 

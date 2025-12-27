@@ -34,7 +34,7 @@ func main() {
 	// Configure multiple named connections
 	config := dgdatabase.Config{
 		Driver:   "sqlite",
-		Name: ":memory:",
+		FilePath: ":memory:",
 
 		// Named connections
 		Connections: map[string]dgdatabase.ConnectionConfig{

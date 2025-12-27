@@ -54,10 +54,9 @@ func main() {
 	}
 
 	// 3. Register provider
-	provider := &dgdatabase.DatabaseServiceProvider{Config: config}
-	if err := app.Register(provider); err != nil {
-		log.Fatal(err)
-	}
+	provider := dgdatabase.NewDatabaseServiceProvider()
+	provider.Config = config // Manually set config for this example
+	app.Register(provider)
 
 	if err := app.Boot(); err != nil {
 		log.Fatal(err)

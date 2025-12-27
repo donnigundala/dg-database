@@ -2,5 +2,5 @@ package dgdatabase
 
 const (
 	Binding = "database"
-	Version = "1.6.0"
+	Version = "1.0.0"
 )

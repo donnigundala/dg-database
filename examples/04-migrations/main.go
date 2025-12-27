@@ -89,7 +89,7 @@ func main() {
 
 	// Rollback example (commented out to preserve data)
 	// fmt.Println("\n=== Rolling Back Last Migration ===")
-	// if err := manager.Rollback(); err != nil {
+	// if err := manager.Rollback(migrations); err != nil {
 	// 	log.Printf("Rollback failed: %v", err)
 	// } else {
 	// 	fmt.Println("✅ Rollback completed")

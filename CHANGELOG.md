@@ -5,120 +5,58 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.5.0] - 2025-12-05
+## [1.0.0] - 2025-12-27
 
 ### Added
-- **DB Interface**: Added `DB` interface for better abstraction and testability
-- **Auto-registration**: Named connections now auto-registered in container
-- **Helper Functions**: Added `Resolve()`, `MustResolve()`, `ResolveConnection()`, `MustResolveConnection()`
-- **Injectable Helper**: Added `Injectable` struct for easier dependency injection
-- New file: `contracts.go` - Database interface definitions
-- New file: `helpers.go` - Resolution and injection helpers
-
-### Enhanced
-- **Provider**: Now auto-registers named connections as `database.<name>` in container
-- **Container Integration**: Named connections accessible via `app.Make("database.analytics")`
-- **Developer Experience**: Simplified multi-connection usage
-
-### Breaking Changes
-- None! All changes are backward compatible
-
-### Usage Examples
-
-```go
-// Before: Manual resolution
-dbInstance, _ := app.Make("database")
-manager := dbInstance.(*database.Manager)
-analyticsDB := manager.Connection("analytics")
-
-// After: Direct resolution
-analyticsDB, _ := app.Make("database.analytics")
-
-// Or use helpers
-db, _ := database.Resolve(app)
-analyticsDB, _ := database.ResolveConnection(app, "analytics")
-
-// Or use Injectable
-inject := database.NewInjectable(app)
-db := inject.DB()
-analyticsDB := inject.Connection("analytics")
-```
-
-## [1.1.0] - 2025-11-24
-
-### Added
-- PostgreSQL schema support via `search_path` parameter
-- `Schema` field in `Config` and `ConnectionConfig` structs
-- `WithSchema(schema string)` fluent configuration method
-- `WithMaxConnections(maxOpen, maxIdle int)` helper method
-- Schema-based multi-tenancy support
-- 4 new tests for schema functionality
-- Example 05: Schema support demonstration
-- Comprehensive schema documentation (docs/SCHEMA.md)
-
-### Enhanced
-- PostgreSQL DSN builders now support schema parameter
-- Multi-tenant examples updated with schema usage
-- README updated with schema examples and use cases
-
-### Documentation
-- Added schema support guide (docs/SCHEMA.md)
-- Updated README with PostgreSQL schema examples
-- Added schema-based multi-tenancy patterns
-- Updated API documentation
-
-### Testing
-- Added `TestPostgresSchemaSupport`
-- Added `TestPostgresDefaultSchema`
-- Added `TestPostgresSchemaFromConnectionConfig`
-- Added `TestConfigWithSchema`
-- Total tests: 40 (all passing)
-
-## [1.0.0] - 2025-11-23
-
-### Added
-- Initial release of dg-database plugin
-- Support for MySQL, PostgreSQL, and SQLite drivers
-- Connection pooling with configurable limits
-- Read/write splitting with automatic routing
-- Load balancing strategies (round-robin, random, weighted)
-- Multi-connection support for managing multiple databases
-- Runtime connection management (add/remove connections)
-- Comprehensive transaction support with context and savepoints
-- Database migration system with up/down/reset functionality
-- Health monitoring for all connections
-- Fluent configuration API
-- Auto-migration support
-- Service provider integration with dg-core framework
-- Comprehensive test suite (36 tests, 55.9% coverage)
-- Complete documentation and examples
+- Initial stable release of the `dg-database` plugin.
+- **Multi-Driver Support**: MySQL, PostgreSQL, and SQLite with unified API.
+- **Connection Management**: Pooling, read/write splitting, and multi-connection support.
+- **Load Balancing**: Round-robin, random, and weighted strategies for read replicas.
+- **Transaction Support**: Full ACID transactions with context and savepoint support.
+- **Migration System**: Version-controlled schema changes with up/down/reset functionality.
+- **PostgreSQL Schema Support**: Multi-tenancy via `search_path` parameter.
+- **Container Integration**: Auto-registration of named connections with Injectable pattern.
+- **Helper Functions**: `Resolve()`, `MustResolve()`, `ResolveConnection()`, `MustResolveConnection()`.
+- **Health Monitoring**: Connection health checks across all databases.
+- **Observability**: OpenTelemetry metrics for connection pool and query performance.
 
 ### Features
-- **Read/Write Splitting**: Automatic routing of reads to slaves, writes to master
-- **Multi-Connection**: Manage multiple named database connections
-- **Migrations**: Version-controlled database schema changes
-- **Transactions**: Full transaction support with automatic commit/rollback
-- **Health Checks**: Monitor connection health across all databases
-- **Load Balancing**: Distribute read load across multiple slaves
+- Thread-safe connection management
+- Automatic routing of reads to slaves, writes to master
+- Runtime connection add/remove capabilities
+- Fluent configuration API with builder pattern
+- Auto-migration support for rapid development
+- Service provider integration with dg-core framework
+- Comprehensive test coverage (40+ tests)
 
 ### Documentation
-- Comprehensive README with quick start guide
-- API reference documentation
-- Migration guide with best practices
-- 4 complete working examples
+- Complete API reference (documentation/API.md)
+- Migration guides (documentation/MIGRATIONS.md, documentation/GO_MIGRATE.md)
+- PostgreSQL schema support guide (documentation/SCHEMA.md)
+- 6 working examples with READMEs
 
-### Testing
-- 36 unit tests covering all major functionality
-- 55.9% code coverage
-- Integration tests with SQLite
+### Performance
+- Connection pooling with configurable limits
+- Read replica load balancing
+- Efficient transaction management
 
-## [Unreleased]
+---
 
-### Planned
-- PostgreSQL-specific features (LISTEN/NOTIFY)
-- MySQL-specific features (LOAD DATA INFILE)
-- Connection retry logic
-- Circuit breaker pattern
-- Metrics and monitoring integration
-- Query caching layer
-- Read replica lag detection
+## Development History
+
+The following versions represent the development journey leading to v1.0.0:
+
+### 2025-12-05
+- Added DB interface for better abstraction
+- Auto-registration of named connections in container
+- Injectable helper for easier dependency injection
+
+### 2025-11-24
+- PostgreSQL schema support via `search_path`
+- Schema-based multi-tenancy patterns
+- Comprehensive schema documentation
+
+### 2025-11-23
+- Initial beta release with core functionality
+- MySQL, PostgreSQL, and SQLite support
+- Read/write splitting and migrations
